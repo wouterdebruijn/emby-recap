@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+
+html, body {
+  height: 100%;
+}
+
+/* Background gradient cyan colors */
+html {
+  background: #2AFADF;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #4C83FF, #2AFADF);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #4C83FF, #2AFADF); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+/* Path: static/app.css */
