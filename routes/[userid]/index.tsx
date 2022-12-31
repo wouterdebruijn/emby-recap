@@ -62,7 +62,7 @@ export const handler: Handlers<RefinedData | null> = {
       totalWatchTimeMovies: movies.reduce((acc, cur) => acc + cur.time, 0),
       totalWatchTimeShows: shows.reduce((acc, cur) => acc + cur.time, 0),
       totalMovies: movies.filter((movie) => movie.time > 600).length,
-      totalShows: shows.length,
+      totalShows: shows.filter((movie) => movie.time > 600).length,
       movieTier: totalWatchListMovie.findIndex((item) => item.UserId === userid) + 1,
       showTier: totalWatchListShow.findIndex((item) => item.UserId === userid) + 1,
     };
