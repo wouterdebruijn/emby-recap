@@ -254,7 +254,11 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
             </span>
           </div>
         </section>
+        <section class="text-center pb-32 font-thin">
+          <h1 class="text-6xl">Happy 2023!</h1>
+        </section>
       </div>
+      <p class="text-white p-2">Created by Wouter de Bruijn - MIT License</p>
     </>
   );
 }
