@@ -98,6 +98,7 @@ export async function getEmbyActivity(): Promise<EmbyActivityList> {
   );
   return response;
 }
+
 export async function getEmbyUserPicture(id: string) {
   const baseurl = Deno.env.get("EMBY_URL") || "http://localhost:8096";
 
@@ -127,4 +128,39 @@ export async function getEmbyUserPicture(id: string) {
   });
 
   return base64;
+}
+
+interface EmbyWatchListEntry {
+  UserId: string;
+  Total: number;
+}
+
+export async function getEmbyWatchList(type: "Movie" | "Episode") {
+  const baseurl = Deno.env.get("EMBY_URL") || "http://localhost:8096";
+
+  const response = await fetch(`${baseurl}/emby/user_usage_stats/submit_custom_query`, {
+    method: "POST",
+    headers: {
+      "X-Emby-Token": Deno.env.get("EMBY_API_KEY") || "",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      CustomQueryString: `SELECT UserId, SUM(PlayDuration) as Total FROM PlaybackActivity WHERE ItemType = '${type}' GROUP BY UserId`,
+      ReplaceUserId: false,
+    }),
+  })
+
+  if (!response.ok) {
+    console.log(response);
+    throw new APIError("Unable to connect to Emby");
+  }
+
+  const json = await response.json();
+
+  return json.results.map((row: [string, number]) => {
+    return {
+      UserId: row[0],
+      Total: row[1],
+    } as EmbyWatchListEntry;
+  }) as EmbyWatchListEntry[];
 }
