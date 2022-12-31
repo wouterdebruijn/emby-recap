@@ -12,6 +12,7 @@ import {
   getEmbyHourly,
   getEmbyMovieList,
   getEmbyShowList,
+  getEmbyWatchList
 } from "../../helper/EmbyData.ts";
 
 interface RefinedData {
@@ -21,8 +22,12 @@ interface RefinedData {
   };
   favoriteHour: { hour: string; count: number };
   favoriteDays: { day: string; count: number }[];
-  totalWatchedMovies: number;
-  totalWatchedShows: number;
+  totalWatchTimeMovies: number;
+  totalWatchTimeShows: number;
+  totalMovies: number;
+  totalShows: number;
+  movieTier: number;
+  showTier: number;
 }
 
 export const handler: Handlers<RefinedData | null> = {
@@ -33,6 +38,8 @@ export const handler: Handlers<RefinedData | null> = {
     const shows = await getEmbyShowList(userid);
     const hourly = await getEmbyHourly(userid);
     const activity = await getEmbyActivity();
+    const totalWatchListMovie = await (await getEmbyWatchList("Movie")).sort((a, b) => b.Total - a.Total);
+    const totalWatchListShow = await (await getEmbyWatchList("Episode")).sort((a, b) => b.Total - a.Total);
 
     if ((!movies || movies.length === 0) && (!shows || shows.length === 0)) {
       return render(null);
@@ -47,13 +54,17 @@ export const handler: Handlers<RefinedData | null> = {
 
     const refinedData = {
       mostWatched: {
-        movies: movies.sort((a, b) => b.time - a.time).slice(0, 8),
-        shows: shows.sort((a, b) => b.time - a.time).slice(0, 8),
+        movies: movies.sort((a, b) => b.time - a.time).slice(0, 9),
+        shows: shows.sort((a, b) => b.time - a.time).slice(0, 9),
       },
       favoriteHour: { hour: hour[0], count: hour[1] },
       favoriteDays: days.map((day) => ({ day: day[0], count: day[1] })),
-      totalWatchedMovies: movies.reduce((acc, cur) => acc + cur.time, 0),
-      totalWatchedShows: shows.reduce((acc, cur) => acc + cur.time, 0),
+      totalWatchTimeMovies: movies.reduce((acc, cur) => acc + cur.time, 0),
+      totalWatchTimeShows: shows.reduce((acc, cur) => acc + cur.time, 0),
+      totalMovies: movies.filter((movie) => movie.time > 600).length,
+      totalShows: shows.length,
+      movieTier: totalWatchListMovie.findIndex((item) => item.UserId === userid) + 1,
+      showTier: totalWatchListShow.findIndex((item) => item.UserId === userid) + 1,
     };
     return render(refinedData);
   },
@@ -112,6 +123,20 @@ function getWeekday(day: number) {
   return weekdays[day];
 }
 
+function getPlace(place: number) {
+  switch (place) {
+    case 1:
+      return "1st";
+    case 2:
+      return "2nd";
+    case 3:
+      return "3rd";
+    default:
+      return `${place}th`;
+  }
+      
+}
+
 export default function Home({ data }: PageProps<RefinedData | null>) {
   if (!data) {
     return <h1>User not found</h1>;
@@ -123,8 +148,8 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
         <title>Fresh App</title>
         <link rel="stylesheet" href="/app.css" />
       </Head>
-      <div class="p-4 mx-auto max-w-screen-xl text-white">
-        <section class="my-32 flex items-center">
+      <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col p-8 py-48">
+        <section class="flex items-center flex-grow">
           <div class="mr-8 hidden md:block">
             <Watch size={128} />
           </div>
@@ -137,17 +162,21 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
             </p>
           </div>
         </section>
-        <section class="my-32 flex items-center">
-          <div class="flex-grow text-right">
+
+        <section class="flex items-center flex-grow flex-row-reverse">
+          <div class="ml-8 hidden md:block">
+            <Calendar size={164} />
+          </div>
+          <div class="text-right">
             <h1 class="text-6xl font-bold">Your biggest watch streaks</h1>
-            <ul class="flex flex-col pt-4 md:flex-row">
+            <ul class="flex flex-col pt-4 xl:flex-row w-auto">
               {data.favoriteDays.map((day, index) => (
                 <li
-                  class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-wrap flex-grow ${
-                    index == 0 ? "md:ml-0" : "md:ml-5"
+                  class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-wrap flex-grow shadow rounded ${
+                    index == 0 ? "xl:ml-0" : "xl:ml-5"
                   } `}
                 >
-                  <div class="mr-auto">
+                  <div class="mr-10">
                     <Clock size={64} index={index} />
                   </div>
                   <div>
@@ -164,62 +193,66 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
               ))}
             </ul>
           </div>
-          <div class="ml-8 hidden md:block">
-            <Calendar size={164} />
+        </section>
+      </div>
+      <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col p-8 py-48">
+        <section class="my-32">
+          <div class="flex flex-col">
+            <h2 class="text-6xl font-bold pt-2">
+              You watched {data.totalMovies} movies this year!
+            </h2>
+            <span class="text-3xl pt-1">That places you on {getPlace(data.movieTier)} place.</span>
+          </div>
+          <div>
+            <ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+              {data.mostWatched.movies.map((movie) => (
+                <li class="bg-white p-5 bg-opacity-20 shadow rounded">
+                  <span class="block text-xl truncate">{movie.label}</span>
+                  <span>
+                    {locateDurationString(movie.time)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="w-full text-center mt-2 bg-white p-5 bg-opacity-20 shadow rounded">
+            <span class="text-3xl">
+              You spend a total of{" "}
+              <span class="font-bold">
+                {locateDurationString(data.totalWatchTimeMovies)}
+              </span>{" "}
+              watching movies
+            </span>
           </div>
         </section>
         <section class="my-32">
-          <h2 class="text-xl font-bold">Most Watched Movies</h2>
-          <ul class="mt-4 flex flex-row">
-            {data.mostWatched.movies.map((movie) => (
-              <li class="p-2 w-48">
-                <img
-                  src="https://radarr.hedium.nl/MediaCover/667/poster-250.jpg?lastWrite=638038030427014794"
-                  alt="Movie IMG"
-                  class="w-48"
-                />
-                <span class="mr-2 block">{movie.label}</span>
-                <span class="text-sm text-gray-500">
-                  {locateDurationString(movie.time)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section class="my-32">
-          <h2 class="text-xl font-bold">Most Watched Shows</h2>
-          <ul class="mt-4 flex flex-row">
-            {data.mostWatched.shows.map((show) => (
-              <li class="p-2 flex-grow w-48">
-                <img
-                  src="https://sonarr.hedium.nl/MediaCover/39/poster-500.jpg?lastWrite=637853028501906896"
-                  alt="Show IMG"
-                  class="w-48"
-                />
-                <span class="mr-2 block">{show.label}</span>
-                <span class="text-sm text-gray-500">
-                  {locateDurationString(show.time)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section class="my-32">
-          <h2 class="text-xl font-bold">Total Watched</h2>
-          <ul>
-            <li class="mt-4">
-              <span class="mr-2 block font-bold">Movies</span>
-              <span class="text-sm text-gray-500">
-                {locateDurationString(data.totalWatchedMovies)}
-              </span>
-            </li>
-            <li class="mt-4">
-              <span class="mr-2 block font-bold">Shows</span>
-              <span class="text-sm text-gray-500">
-                {locateDurationString(data.totalWatchedShows)}
-              </span>
-            </li>
-          </ul>
+        <div class="flex flex-col">
+            <h2 class="text-6xl font-bold pt-2">
+              You watched {data.totalShows} shows this year!
+            </h2>
+            <span class="text-3xl pt-1">That places you on {getPlace(data.showTier)} place.</span>
+          </div>
+          <div>
+            <ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+              {data.mostWatched.shows.map((show) => (
+                <li class="bg-white p-5 bg-opacity-20 shadow rounded">
+                  <span class="block text-xl truncate">{show.label}</span>
+                  <span>
+                    {locateDurationString(show.time)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="w-full text-center mt-2 bg-white p-5 bg-opacity-20 shadow rounded">
+            <span class="text-3xl">
+              You spend a total of{" "}
+              <span class="font-bold">
+                {locateDurationString(data.totalWatchTimeShows)}
+              </span>{" "}
+              watching movies
+            </span>
+          </div>
         </section>
       </div>
     </>
