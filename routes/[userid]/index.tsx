@@ -147,6 +147,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
       <Head>
         <title>Fresh App</title>
         <link rel="stylesheet" href="/app.css" />
+        <script defer data-domain="recap.hedium.nl" src="https://plausible.hedium.nl/js/script.js"></script>
       </Head>
       <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col p-8 py-48">
         <section class="flex items-center flex-grow">
