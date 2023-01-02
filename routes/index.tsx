@@ -43,7 +43,6 @@ export default function Home(
       <Head>
         <title>Fresh App</title>
         <link rel="stylesheet" href="/app.css" />
-        <script defer data-domain="recap.hedium.nl" src="https://plausible.hedium.nl/js/script.js"></script>
       </Head>
       <div class="p-4 mx-auto max-w-screen-md">
         <h1 class="text-2xl font-bold">Emby Users</h1>

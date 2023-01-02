@@ -138,17 +138,21 @@ interface EmbyWatchListEntry {
 export async function getEmbyWatchList(type: "Movie" | "Episode") {
   const baseurl = Deno.env.get("EMBY_URL") || "http://localhost:8096";
 
-  const response = await fetch(`${baseurl}/emby/user_usage_stats/submit_custom_query`, {
-    method: "POST",
-    headers: {
-      "X-Emby-Token": Deno.env.get("EMBY_API_KEY") || "",
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${baseurl}/emby/user_usage_stats/submit_custom_query`,
+    {
+      method: "POST",
+      headers: {
+        "X-Emby-Token": Deno.env.get("EMBY_API_KEY") || "",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        CustomQueryString:
+          `SELECT UserId, SUM(PlayDuration) as Total FROM PlaybackActivity WHERE ItemType = '${type}' GROUP BY UserId`,
+        ReplaceUserId: false,
+      }),
     },
-    body: JSON.stringify({
-      CustomQueryString: `SELECT UserId, SUM(PlayDuration) as Total FROM PlaybackActivity WHERE ItemType = '${type}' GROUP BY UserId`,
-      ReplaceUserId: false,
-    }),
-  })
+  );
 
   if (!response.ok) {
     console.log(response);

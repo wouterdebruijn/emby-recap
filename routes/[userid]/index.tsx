@@ -12,7 +12,7 @@ import {
   getEmbyHourly,
   getEmbyMovieList,
   getEmbyShowList,
-  getEmbyWatchList
+  getEmbyWatchList,
 } from "../../helper/EmbyData.ts";
 
 interface RefinedData {
@@ -38,8 +38,14 @@ export const handler: Handlers<RefinedData | null> = {
     const shows = await getEmbyShowList(userid);
     const hourly = await getEmbyHourly(userid);
     const activity = await getEmbyActivity();
-    const totalWatchListMovie = await (await getEmbyWatchList("Movie")).sort((a, b) => b.Total - a.Total);
-    const totalWatchListShow = await (await getEmbyWatchList("Episode")).sort((a, b) => b.Total - a.Total);
+    const totalWatchListMovie = await (await getEmbyWatchList("Movie")).sort((
+      a,
+      b,
+    ) => b.Total - a.Total);
+    const totalWatchListShow = await (await getEmbyWatchList("Episode")).sort((
+      a,
+      b,
+    ) => b.Total - a.Total);
 
     if ((!movies || movies.length === 0) && (!shows || shows.length === 0)) {
       return render(null);
@@ -63,8 +69,10 @@ export const handler: Handlers<RefinedData | null> = {
       totalWatchTimeShows: shows.reduce((acc, cur) => acc + cur.time, 0),
       totalMovies: movies.filter((movie) => movie.time > 600).length,
       totalShows: shows.filter((movie) => movie.time > 600).length,
-      movieTier: totalWatchListMovie.findIndex((item) => item.UserId === userid) + 1,
-      showTier: totalWatchListShow.findIndex((item) => item.UserId === userid) + 1,
+      movieTier:
+        totalWatchListMovie.findIndex((item) => item.UserId === userid) + 1,
+      showTier: totalWatchListShow.findIndex((item) => item.UserId === userid) +
+        1,
     };
     return render(refinedData);
   },
@@ -134,7 +142,6 @@ function getPlace(place: number) {
     default:
       return `${place}th`;
   }
-      
 }
 
 export default function Home({ data }: PageProps<RefinedData | null>) {
@@ -147,7 +154,6 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
       <Head>
         <title>Fresh App</title>
         <link rel="stylesheet" href="/app.css" />
-        <script defer data-domain="recap.hedium.nl" src="https://plausible.hedium.nl/js/script.js"></script>
       </Head>
       <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col p-8 py-48">
         <section class="flex items-center flex-grow my-20">
@@ -202,7 +208,9 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
             <h2 class="text-6xl font-bold pt-2">
               You watched {data.totalMovies} movies this year!
             </h2>
-            <span class="text-3xl pt-1">That places you on {getPlace(data.movieTier)} place.</span>
+            <span class="text-3xl pt-1">
+              That places you on {getPlace(data.movieTier)} place.
+            </span>
           </div>
           <div>
             <ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
@@ -227,11 +235,13 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           </div>
         </section>
         <section class="my-32">
-        <div class="flex flex-col">
+          <div class="flex flex-col">
             <h2 class="text-6xl font-bold pt-2">
               You watched {data.totalShows} shows this year!
             </h2>
-            <span class="text-3xl pt-1">That places you on {getPlace(data.showTier)} place.</span>
+            <span class="text-3xl pt-1">
+              That places you on {getPlace(data.showTier)} place.
+            </span>
           </div>
           <div>
             <ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
