@@ -150,7 +150,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
         <script defer data-domain="recap.hedium.nl" src="https://plausible.hedium.nl/js/script.js"></script>
       </Head>
       <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col p-8 py-48">
-        <section class="flex items-center flex-grow">
+        <section class="flex items-center flex-grow my-20">
           <div class="mr-8 hidden md:block">
             <Watch size={128} />
           </div>
@@ -164,7 +164,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           </div>
         </section>
 
-        <section class="flex items-center flex-grow flex-row-reverse">
+        <section class="flex items-center flex-grow flex-row-reverse my-12">
           <div class="ml-8 hidden md:block">
             <Calendar size={164} />
           </div>
