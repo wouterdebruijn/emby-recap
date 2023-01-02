@@ -1,4 +1,4 @@
-name: Updates
+name: Deno dependencies update PRs
 
 on:
   schedule:
