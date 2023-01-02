@@ -1,0 +1,24 @@
+name: Publish Docker image
+
+on:
+  push:
+  
+jobs:
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Setup latest Deno version
+        uses: denolib/setup-deno@v2
+        with:
+          deno-version: v1.x
+
+      - name: Run Deno fmt
+        run: deno fmt --check
+
+      - name: Run Deno lint
+        run: deno lint
