@@ -50,3 +50,7 @@ deno run --allow-read --allow-env --allow-net main.ts
 
 <img src="./.github/screenshots/emby-recap-1.png" />
 <img src="./.github/screenshots/emby-recap-2.png" />
+
+# Known issues
+## Emby returns `Object reference not set to an instance of an object.`
+The API Emby token doesn't have access to the Playback reporting plugin. Please create an administrator user and copy its X-Emby-Token. More information [here](https://github.com/wouterdebruijn/emby-recap/wiki/Installation-and-utilization)
