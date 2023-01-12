@@ -34,22 +34,29 @@ export const handler: Handlers<RefinedData | null> = {
   async GET(_, { render, params }) {
     const userid = params.userid;
 
-    const movies = await getEmbyMovieList(userid);
-    const shows = await getEmbyShowList(userid);
-    const hourly = await getEmbyHourly(userid);
-    const activity = await getEmbyActivity();
-    const totalWatchListMovie = await (await getEmbyWatchList("Movie")).sort((
-      a,
-      b,
-    ) => b.Total - a.Total);
-    const totalWatchListShow = await (await getEmbyWatchList("Episode")).sort((
-      a,
-      b,
-    ) => b.Total - a.Total);
+    const [
+      movies,
+      shows,
+    ] = await Promise.all([
+      getEmbyMovieList(userid),
+      getEmbyShowList(userid),
+    ]);
 
     if ((!movies || movies.length === 0) && (!shows || shows.length === 0)) {
       return render(null);
     }
+
+    const [
+      hourly,
+      activity,
+      totalWatchListMovie,
+      totalWatchListShow,
+    ] = await Promise.all([
+      getEmbyHourly(userid),
+      getEmbyActivity(),
+      getEmbyWatchList("Movie"),
+      getEmbyWatchList("Episode"),
+    ]);
 
     const userActivity = activity.filter((item) => item.user_id === userid)[0];
 
@@ -144,9 +151,25 @@ function getPlace(place: number) {
   }
 }
 
+/**
+ * @returns {JSX.Element} A JSX element containing a message if it's the new year
+ */
+function NewYearMessage() {
+  const now = new Date();
+  if (now.getMonth() === 11 && now.getDate() > 25) {
+    return <h1 class="text-6xl">Happy {now.getFullYear() + 1}!</h1>;
+  }
+  if (now.getMonth() === 0 && now.getDate() < 5) {
+    return <h1 class="text-6xl">Happy {now.getFullYear()}</h1>;
+  }
+  return <></>;
+}
+
 export default function Home({ data }: PageProps<RefinedData | null>) {
   if (!data) {
-    return <h1>User not found</h1>;
+    return (
+      <h1>This user doesn't have enough activity to provide statistics.</h1>
+    );
   }
 
   return (
@@ -266,7 +289,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           </div>
         </section>
         <section class="text-center pb-32 font-thin">
-          <h1 class="text-6xl">Happy 2023!</h1>
+          <NewYearMessage />
         </section>
       </div>
       <p class="text-white p-2">Created by Wouter de Bruijn - MIT License</p>
