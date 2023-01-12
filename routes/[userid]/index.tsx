@@ -34,22 +34,29 @@ export const handler: Handlers<RefinedData | null> = {
   async GET(_, { render, params }) {
     const userid = params.userid;
 
-    const movies = await getEmbyMovieList(userid);
-    const shows = await getEmbyShowList(userid);
-    const hourly = await getEmbyHourly(userid);
-    const activity = await getEmbyActivity();
-    const totalWatchListMovie = await (await getEmbyWatchList("Movie")).sort((
-      a,
-      b,
-    ) => b.Total - a.Total);
-    const totalWatchListShow = await (await getEmbyWatchList("Episode")).sort((
-      a,
-      b,
-    ) => b.Total - a.Total);
+    const [
+      movies,
+      shows,
+    ] = await Promise.all([
+      getEmbyMovieList(userid),
+      getEmbyShowList(userid),
+    ]);
 
     if ((!movies || movies.length === 0) && (!shows || shows.length === 0)) {
       return render(null);
     }
+
+    const [
+      hourly,
+      activity,
+      totalWatchListMovie,
+      totalWatchListShow,
+    ] = await Promise.all([
+      getEmbyHourly(userid),
+      getEmbyActivity(),
+      getEmbyWatchList("Movie"),
+      getEmbyWatchList("Episode"),
+    ]);
 
     const userActivity = activity.filter((item) => item.user_id === userid)[0];
 

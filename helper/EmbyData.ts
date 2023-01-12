@@ -190,5 +190,8 @@ export async function getEmbyWatchList(
       UserId: row[0],
       Total: +row[1],
     };
-  });
+  }).sort((
+    a,
+    b,
+  ) => b.Total - a.Total);
 }
