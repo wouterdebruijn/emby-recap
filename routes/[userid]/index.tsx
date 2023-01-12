@@ -151,6 +151,20 @@ function getPlace(place: number) {
   }
 }
 
+/**
+ * @returns {JSX.Element} A JSX element containing a message if it's the new year
+ */
+function NewYearMessage() {
+  const now = new Date();
+  if (now.getMonth() === 11 && now.getDate() > 25) {
+    return <h1 class="text-6xl">Happy {now.getFullYear() + 1}!</h1>;
+  }
+  if (now.getMonth() === 0 && now.getDate() < 5) {
+    return <h1 class="text-6xl">Happy {now.getFullYear()}</h1>;
+  }
+  return <></>;
+}
+
 export default function Home({ data }: PageProps<RefinedData | null>) {
   if (!data) {
     return (
@@ -275,7 +289,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           </div>
         </section>
         <section class="text-center pb-32 font-thin">
-          <h1 class="text-6xl">Happy 2023!</h1>
+          <NewYearMessage />
         </section>
       </div>
       <p class="text-white p-2">Created by Wouter de Bruijn - MIT License</p>
