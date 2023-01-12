@@ -153,7 +153,9 @@ function getPlace(place: number) {
 
 export default function Home({ data }: PageProps<RefinedData | null>) {
   if (!data) {
-    return <h1>User not found</h1>;
+    return (
+      <h1>This user doesn't have enough activity to provide statistics.</h1>
+    );
   }
 
   return (
