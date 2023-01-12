@@ -11,21 +11,65 @@ export class APIError extends Error {
 const end_date = "2022-12-31";
 const days = "365";
 
-export async function get<T extends unknown>(url: string) {
+/**
+ * Get the baseURL provided by the Environment variables. Falls back to localhost.
+ *
+ * @returns BaseURL for Emby without any slashes
+ */
+function getBaseURL() {
+  if (!Deno.env.get("EMBY_URL")) {
+    console.error("Warning: No Emby URL provided. Falling back to localhost");
+  }
   const baseurl = Deno.env.get("EMBY_URL") || "http://localhost:8096";
+  return baseurl.replace(/\/+$/, "");
+}
 
-  const response = await fetch(baseurl + url, {
+async function apiRequest(
+  url: string,
+  options: RequestInit = {},
+) {
+  const response = await fetch(`${getBaseURL()}${url}`, {
+    ...options,
     headers: {
       "X-Emby-Token": Deno.env.get("EMBY_API_KEY") || "",
+      ...options.headers,
     },
+  }).catch((e) => {
+    console.error("Unable to connect to Emby", e.message);
+    throw new APIError("Unable to connect to Emby");
   });
 
-  if (!response.ok) {
-    console.log(response);
-    throw new APIError("Unable to connect to Emby");
-  }
+  return response;
+}
 
+export async function get<T extends unknown>(url: string) {
+  const response = await apiRequest(url);
+  if (!response.ok) {
+    console.error("Emby returned unexpected response: ", await response.text());
+    throw new APIError("Emby returned unexpected response");
+  }
   return response.json() as Promise<T>;
+}
+
+export async function post<T extends unknown>(url: string, body: unknown) {
+  const response = await apiRequest(url, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    console.error("Emby returned unexpected response: ", await response.text());
+    throw new APIError("Emby returned unexpected response");
+  }
+  return response.json() as Promise<T>;
+}
+
+interface EmbyCustomQueryResponse<T extends unknown> {
+  colums: string[];
+  results: T[];
+  message: string;
 }
 
 export interface EmbyUserListEntry {
@@ -99,14 +143,8 @@ export async function getEmbyActivity(): Promise<EmbyActivityList> {
   return response;
 }
 
-export async function getEmbyUserPicture(id: string) {
-  const baseurl = Deno.env.get("EMBY_URL") || "http://localhost:8096";
-
-  const response = await fetch(`${baseurl}/emby/Users/${id}/Images/Primary`, {
-    headers: {
-      "X-Emby-Token": Deno.env.get("EMBY_API_KEY") || "",
-    },
-  });
+export async function getEmbyUserPicture(id: string): Promise<string> {
+  const response = await apiRequest(`/emby/Users/${id}/Images/Primary`);
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -129,42 +167,27 @@ export async function getEmbyUserPicture(id: string) {
 
   return base64;
 }
-
 interface EmbyWatchListEntry {
   UserId: string;
   Total: number;
 }
 
-export async function getEmbyWatchList(type: "Movie" | "Episode") {
-  const baseurl = Deno.env.get("EMBY_URL") || "http://localhost:8096";
-
-  const response = await fetch(
-    `${baseurl}/emby/user_usage_stats/submit_custom_query`,
+export async function getEmbyWatchList(
+  type: "Movie" | "Episode",
+): Promise<EmbyWatchListEntry[]> {
+  const list = await post<EmbyCustomQueryResponse<[string, string]>>(
+    `/emby/user_usage_stats/submit_custom_query`,
     {
-      method: "POST",
-      headers: {
-        "X-Emby-Token": Deno.env.get("EMBY_API_KEY") || "",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        CustomQueryString:
-          `SELECT UserId, SUM(PlayDuration) as Total FROM PlaybackActivity WHERE ItemType = '${type}' GROUP BY UserId`,
-        ReplaceUserId: false,
-      }),
+      CustomQueryString:
+        `SELECT UserId, SUM(PlayDuration) as Total FROM PlaybackActivity WHERE ItemType = '${type}' GROUP BY UserId`,
+      ReplaceUserId: false,
     },
   );
 
-  if (!response.ok) {
-    console.log(response);
-    throw new APIError("Unable to connect to Emby");
-  }
-
-  const json = await response.json();
-
-  return json.results.map((row: [string, number]) => {
+  return list.results.map((row: [string, string]) => {
     return {
       UserId: row[0],
-      Total: row[1],
-    } as EmbyWatchListEntry;
-  }) as EmbyWatchListEntry[];
+      Total: +row[1],
+    };
+  });
 }
