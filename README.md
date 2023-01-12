@@ -16,9 +16,14 @@ Emby-Replay connects to your Emby instance over Http(s), a valid URL and api key
 need to be provided through environment variables. The following environment
 variables are required:
 
-- EMBY_URL=http://localhost:8096 # Emby URL to your Emby server
-- EMBY_API_KEY=ADMIN_ACCOUNT_TOKEN # Emby API key
-  [generated through the Emby dashboard.](https://github.com/MediaBrowser/Emby/wiki/API-Key-Authentication)
+- EMBY_URL=http://localhost:8096 _# Emby URL to your Emby server_
+- EMBY_API_KEY=ADMIN_ACCOUNT_TOKEN _# Emby API key
+  [generated through the Emby dashboard.](https://github.com/MediaBrowser/Emby/wiki/API-Key-Authentication)_
+
+The following environment variables are optional:
+
+- END_DATE _# The ending date for data queries. Defaults the current day._
+- DAYS _# The amount of days we collect data for. Defaults to 365_
 
 ## Docker Direct run
 

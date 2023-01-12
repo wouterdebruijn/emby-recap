@@ -8,8 +8,9 @@ export class APIError extends Error {
   }
 }
 
-const end_date = "2022-12-31";
-const days = "365";
+const end_date = Deno.env.get("END_DATE") ||
+  new Date().toISOString().split("T")[0];
+const days = Deno.env.get("DAYS") || "365";
 
 /**
  * Get the baseURL provided by the Environment variables. Falls back to localhost.
