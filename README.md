@@ -12,6 +12,8 @@ possible to run the project directly when Docker is not desired. The docker
 image provides the website on port 8000, which should be mapped to the
 appropriate port on your host system.
 
+The [Emby Playback Reporting](https://github.com/faush01/playback_reporting) plugin is required and should be installed through your Emby Plugins catalog. Keep in mind the data will be collected after the installation of this plugin.
+
 Emby-Replay connects to your Emby instance over Http(s), a valid URL and api key
 need to be provided through environment variables. The following environment
 variables are required:
@@ -36,7 +38,7 @@ docker run -d -p 80:8000 -e "EMBY_URL=http://localhost:8096" -e "EMBY_API_KEY=em
 ```yaml
 services:
   app:
-    image: emby-recap:latest
+    image: hedium/emby-recap:latest
     environment:
       EMBY_URL: "http://localhost:8096"
       EMBY_API_KEY: "ADMIN_ACCOUNT_TOKEN"
