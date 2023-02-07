@@ -10,6 +10,7 @@ export function Calendar(
       height={size}
       width={size}
       class="inline"
+      alt="Calendar icon"
     >
       <path fill="#66757F" d="M28.815 4h1.996v1h-1.996z" />
       <path

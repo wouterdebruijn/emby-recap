@@ -10,6 +10,7 @@ export function Movie(
       height={size}
       width={size}
       class="inline"
+      alt="Movie icon"
     >
       <path
         fill="#31373D"
