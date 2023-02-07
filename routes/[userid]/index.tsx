@@ -202,11 +202,11 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
             <ul class="flex flex-col pt-4 xl:flex-row w-auto">
               {data.favoriteDays.map((day, index) => (
                 <li
-                  class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-wrap flex-grow shadow rounded ${
+                  class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row shadow rounded justify-between ${
                     index == 0 ? "xl:ml-0" : "xl:ml-5"
                   } `}
                 >
-                  <div class="mr-10">
+                  <div>
                     <Clock size={64} index={index} />
                   </div>
                   <div>
