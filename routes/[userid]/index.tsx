@@ -249,7 +249,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           </div>
           <div class="w-full text-center mt-2 bg-white p-5 bg-opacity-20 shadow rounded">
             <span class="text-3xl">
-              You spend a total of{" "}
+              You spent a total of{" "}
               <span class="font-bold">
                 {locateDurationString(data.totalWatchTimeMovies)}
               </span>{" "}
@@ -280,7 +280,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           </div>
           <div class="w-full text-center mt-2 bg-white p-5 bg-opacity-20 shadow rounded">
             <span class="text-3xl">
-              You spend a total of{" "}
+              You spent a total of{" "}
               <span class="font-bold">
                 {locateDurationString(data.totalWatchTimeShows)}
               </span>{" "}
@@ -292,7 +292,11 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           <NewYearMessage />
         </section>
       </div>
-      <p class="text-white p-2">Created by Wouter de Bruijn - MIT License</p>
+      <p class="text-white p-2">
+        Created by{" "}
+        <a href="https://github.com/wouterdebruijn/">Wouter de Bruijn</a>{" "}
+        - MIT License
+      </p>
     </>
   );
 }
