@@ -197,12 +197,12 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           <div class="ml-8 hidden md:block">
             <Calendar size={164} />
           </div>
-          <div class="text-right">
+          <div class="text-right w-full">
             <h1 class="text-6xl font-bold">Your biggest watch streaks</h1>
-            <ul class="flex flex-col pt-4 xl:flex-row w-auto">
+            <ul class="flex flex-col pt-4 xl:flex-row w-full">
               {data.favoriteDays.map((day, index) => (
                 <li
-                  class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row shadow rounded justify-between ${
+                  class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-grow shadow rounded justify-between ${
                     index == 0 ? "xl:ml-0" : "xl:ml-5"
                   } `}
                 >
