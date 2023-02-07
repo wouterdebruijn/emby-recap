@@ -99,15 +99,15 @@ function locateDurationString(duration: number, hoursOnly = false) {
   }
 
   if (days !== 0 && hours !== 0 && minutes !== 0) {
-    return `${days} days ${hours} hours ${minutes} minutes`;
+    return `${days} days, ${hours} hours and ${minutes} minutes`;
   }
 
   if (hours !== 0 && minutes !== 0) {
-    return `${hours} hours ${minutes} minutes`;
+    return `${hours} hours and ${minutes} minutes`;
   }
 
   if (days !== 0 && hours !== 0) {
-    return `${days} days ${hours} hours`;
+    return `${days} days and ${hours} hours`;
   }
 
   if (days !== 0) {
