@@ -41,7 +41,7 @@ export default function Home(
   return (
     <>
       <Head>
-        <title>Fresh App</title>
+        <title>Emby Recap</title>
         <link rel="stylesheet" href="/app.css" />
       </Head>
       <div class="p-4 mx-auto max-w-screen-md">

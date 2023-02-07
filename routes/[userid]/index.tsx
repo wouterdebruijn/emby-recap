@@ -28,11 +28,13 @@ interface RefinedData {
   totalShows: number;
   movieTier: number;
   showTier: number;
+  username: string;
 }
 
 export const handler: Handlers<RefinedData | null> = {
-  async GET(_, { render, params }) {
+  async GET({ url }, { render, params }) {
     const userid = params.userid;
+    const username = new URL(url).searchParams.get("name") ?? "Someone";
 
     const [
       movies,
@@ -80,6 +82,7 @@ export const handler: Handlers<RefinedData | null> = {
         totalWatchListMovie.findIndex((item) => item.UserId === userid) + 1,
       showTier: totalWatchListShow.findIndex((item) => item.UserId === userid) +
         1,
+      username,
     };
     return render(refinedData);
   },
@@ -175,7 +178,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
   return (
     <>
       <Head>
-        <title>Fresh App</title>
+        <title>{data.username}'s Statistics</title>
         <link rel="stylesheet" href="/app.css" />
       </Head>
       <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col p-8 py-48">
