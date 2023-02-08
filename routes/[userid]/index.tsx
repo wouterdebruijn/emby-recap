@@ -28,11 +28,13 @@ interface RefinedData {
   totalShows: number;
   movieTier: number;
   showTier: number;
+  username: string;
 }
 
 export const handler: Handlers<RefinedData | null> = {
-  async GET(_, { render, params }) {
+  async GET({ url }, { render, params }) {
     const userid = params.userid;
+    const username = new URL(url).searchParams.get("name") ?? "Someone";
 
     const [
       movies,
@@ -80,6 +82,7 @@ export const handler: Handlers<RefinedData | null> = {
         totalWatchListMovie.findIndex((item) => item.UserId === userid) + 1,
       showTier: totalWatchListShow.findIndex((item) => item.UserId === userid) +
         1,
+      username,
     };
     return render(refinedData);
   },
@@ -99,15 +102,15 @@ function locateDurationString(duration: number, hoursOnly = false) {
   }
 
   if (days !== 0 && hours !== 0 && minutes !== 0) {
-    return `${days} days ${hours} hours ${minutes} minutes`;
+    return `${days} days, ${hours} hours and ${minutes} minutes`;
   }
 
   if (hours !== 0 && minutes !== 0) {
-    return `${hours} hours ${minutes} minutes`;
+    return `${hours} hours and ${minutes} minutes`;
   }
 
   if (days !== 0 && hours !== 0) {
-    return `${days} days ${hours} hours`;
+    return `${days} days and ${hours} hours`;
   }
 
   if (days !== 0) {
@@ -175,7 +178,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
   return (
     <>
       <Head>
-        <title>Fresh App</title>
+        <title>{data.username}'s Statistics</title>
         <link rel="stylesheet" href="/app.css" />
       </Head>
       <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col p-8 py-48">
@@ -197,16 +200,16 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           <div class="ml-8 hidden md:block">
             <Calendar size={164} />
           </div>
-          <div class="text-right">
+          <div class="text-right w-full">
             <h1 class="text-6xl font-bold">Your biggest watch streaks</h1>
-            <ul class="flex flex-col pt-4 xl:flex-row w-auto">
+            <ul class="flex flex-col pt-4 xl:flex-row w-full">
               {data.favoriteDays.map((day, index) => (
                 <li
-                  class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-wrap flex-grow shadow rounded ${
+                  class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-grow shadow rounded justify-between ${
                     index == 0 ? "xl:ml-0" : "xl:ml-5"
                   } `}
                 >
-                  <div class="mr-10">
+                  <div>
                     <Clock size={64} index={index} />
                   </div>
                   <div>
@@ -249,7 +252,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           </div>
           <div class="w-full text-center mt-2 bg-white p-5 bg-opacity-20 shadow rounded">
             <span class="text-3xl">
-              You spend a total of{" "}
+              You spent a total of{" "}
               <span class="font-bold">
                 {locateDurationString(data.totalWatchTimeMovies)}
               </span>{" "}
@@ -280,7 +283,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           </div>
           <div class="w-full text-center mt-2 bg-white p-5 bg-opacity-20 shadow rounded">
             <span class="text-3xl">
-              You spend a total of{" "}
+              You spent a total of{" "}
               <span class="font-bold">
                 {locateDurationString(data.totalWatchTimeShows)}
               </span>{" "}
@@ -292,7 +295,11 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
           <NewYearMessage />
         </section>
       </div>
-      <p class="text-white p-2">Created by Wouter de Bruijn - MIT License</p>
+      <p class="text-white p-2">
+        Created by{" "}
+        <a href="https://github.com/wouterdebruijn/">Wouter de Bruijn</a>{" "}
+        - MIT License
+      </p>
     </>
   );
 }

@@ -10,6 +10,7 @@ export function Watch(
       height={size}
       width={size}
       class="inline"
+      alt="Watch icon"
     >
       <path
         fill="#31373D"

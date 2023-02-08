@@ -25,6 +25,7 @@ function Clock1(
       height={size}
       width={size}
       class="inline"
+      alt="Clock icon"
     >
       <circle fill="#99AAB5" cx="18" cy="18" r="18" />
       <circle fill="#E1E8ED" cx="18" cy="18" r="14" />
