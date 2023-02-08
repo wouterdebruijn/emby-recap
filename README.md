@@ -7,7 +7,8 @@ Displaying watch times, durations, relative placements and counters.
 
 # Installation
 
-Available on [Docker Hub](https://hub.docker.com/repository/docker/hedium/emby-recap/general)
+Available on
+[Docker Hub](https://hub.docker.com/repository/docker/hedium/emby-recap/general)
 
 This project is released as a docker image available on DockerHub. It is also
 possible to run the project directly when Docker is not desired. The docker
