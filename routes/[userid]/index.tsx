@@ -87,14 +87,21 @@ export const handler: Handlers<RefinedData | null> = {
       username,
       totalTime: movies.reduce((acc, cur) => acc + cur.time, 0) +
         shows.reduce((acc, cur) => acc + cur.time, 0),
-      firstDay: Object.entries(userActivity.user_usage).filter((item) => item[1] > 0)[0],
+      firstDay:
+        Object.entries(userActivity.user_usage).filter((item) =>
+          item[1] > 0
+        )[0],
     };
     return render(refinedData);
   },
 };
 
 // Duration is in seconds
-function locateDurationString(duration: number, hoursOnly = false, daysOnly = false) {
+function locateDurationString(
+  duration: number,
+  hoursOnly = false,
+  daysOnly = false,
+) {
   const remaining = duration;
   const days = Math.floor(remaining / 86400);
   const hours = Math.floor((remaining - (days * 86400)) / 3600);
@@ -202,9 +209,11 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
               </span>
             </h1>
             <p class="mt-4 text-3xl">
-              Your total watch time since {new Date(data.firstDay[0]).toLocaleDateString("en-US", {
+              Your total watch time since{" "}
+              {new Date(data.firstDay[0]).toLocaleDateString("en-US", {
                 dateStyle: "long",
-              })}. That is {` ${locateDurationString(data.totalTime, false, true)}`}!
+              })}. That is{" "}
+              {` ${locateDurationString(data.totalTime, false, true)}`}!
             </p>
           </div>
         </section>
@@ -225,8 +234,9 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
               <ul class="flex flex-col pt-4 xl:flex-row w-full">
                 {data.favoriteDays.map((day, index) => (
                   <li
-                    class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-grow shadow rounded justify-between ${index == 0 ? "xl:ml-0" : "xl:ml-5"
-                      } `}
+                    class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-grow shadow rounded justify-between ${
+                      index == 0 ? "xl:ml-0" : "xl:ml-5"
+                    } `}
                   >
                     <div>
                       <Clock size={64} index={index} />
