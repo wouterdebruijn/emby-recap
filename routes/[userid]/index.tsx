@@ -29,6 +29,8 @@ interface RefinedData {
   movieTier: number;
   showTier: number;
   username: string;
+  totalTime: number;
+  firstDay: { day: string; count: number };
 }
 
 export const handler: Handlers<RefinedData | null> = {
@@ -83,13 +85,16 @@ export const handler: Handlers<RefinedData | null> = {
       showTier: totalWatchListShow.findIndex((item) => item.UserId === userid) +
         1,
       username,
+      totalTime: movies.reduce((acc, cur) => acc + cur.time, 0) +
+        shows.reduce((acc, cur) => acc + cur.time, 0),
+      firstDay: Object.entries(userActivity.user_usage).filter((item) => item[1] > 0)[0],
     };
     return render(refinedData);
   },
 };
 
 // Duration is in seconds
-function locateDurationString(duration: number, hoursOnly = false) {
+function locateDurationString(duration: number, hoursOnly = false, daysOnly = false) {
   const remaining = duration;
   const days = Math.floor(remaining / 86400);
   const hours = Math.floor((remaining - (days * 86400)) / 3600);
@@ -98,7 +103,11 @@ function locateDurationString(duration: number, hoursOnly = false) {
   );
 
   if (hoursOnly && hours !== 0) {
-    return `${hours} hours`;
+    return hours === 1 ? `${hours} hour` : `${hours} hours`;
+  }
+
+  if (daysOnly && days !== 0) {
+    return days === 1 ? `${days} day` : `${days} days`;
   }
 
   if (days !== 0 && hours !== 0 && minutes !== 0) {
@@ -187,11 +196,15 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
             <Watch size={128} />
           </div>
           <div class="flex-grow">
-            <h1 class="text-7xl font-bold">Your favorite time</h1>
+            <h1 class="text-7xl font-bold">
+              <span class="font-bold">
+                {`${Math.ceil(data.totalTime / 60)} `} minutes.
+              </span>
+            </h1>
             <p class="mt-4 text-3xl">
-              You regularly watch on{" "}
-              {getWeekday(+data.favoriteHour.hour.split("-")[0])} at{" "}
-              {data.favoriteHour.hour.split("-")[1]}:00.
+              Your total watch time since {new Date(data.firstDay[0]).toLocaleDateString("en-US", {
+                dateStyle: "long",
+              })}. That is {` ${locateDurationString(data.totalTime, false, true)}`}!
             </p>
           </div>
         </section>
@@ -201,30 +214,37 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
             <Calendar size={164} />
           </div>
           <div class="text-right w-full">
-            <h1 class="text-6xl font-bold">Your biggest watch streaks</h1>
-            <ul class="flex flex-col pt-4 xl:flex-row w-full">
-              {data.favoriteDays.map((day, index) => (
-                <li
-                  class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-grow shadow rounded justify-between ${
-                    index == 0 ? "xl:ml-0" : "xl:ml-5"
-                  } `}
-                >
-                  <div>
-                    <Clock size={64} index={index} />
-                  </div>
-                  <div>
-                    <h2 class="text-2xl text-white">
-                      {locateDurationString(day.count, true)}
-                    </h2>
-                    <span class="text-sm">
-                      {new Date(day.day).toLocaleDateString("en-US", {
-                        dateStyle: "full",
-                      })}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div class="pb-8">
+              <h1 class="text-7xl font-bold">Your favorite time</h1>
+              <p class="mt-4 text-3xl">
+                You regularly watch on{" "}
+                {getWeekday(+data.favoriteHour.hour.split("-")[0])} at{" "}
+                {data.favoriteHour.hour.split("-")[1]}:00
+                <br />Here are some of your biggest streaks
+              </p>
+              <ul class="flex flex-col pt-4 xl:flex-row w-full">
+                {data.favoriteDays.map((day, index) => (
+                  <li
+                    class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-grow shadow rounded justify-between ${index == 0 ? "xl:ml-0" : "xl:ml-5"
+                      } `}
+                  >
+                    <div>
+                      <Clock size={64} index={index} />
+                    </div>
+                    <div>
+                      <h2 class="text-2xl text-white">
+                        {locateDurationString(day.count, true)}
+                      </h2>
+                      <span class="text-sm">
+                        {new Date(day.day).toLocaleDateString("en-US", {
+                          dateStyle: "full",
+                        })}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
       </div>
@@ -235,7 +255,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
               You watched {data.totalMovies} movies this year!
             </h2>
             <span class="text-3xl pt-1">
-              That places you on {getPlace(data.movieTier)} place.
+              That places you on {getPlace(data.movieTier)} place
             </span>
           </div>
           <div>
@@ -266,7 +286,7 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
               You watched {data.totalShows} shows this year!
             </h2>
             <span class="text-3xl pt-1">
-              That places you on {getPlace(data.showTier)} place.
+              That places you on {getPlace(data.showTier)} place
             </span>
           </div>
           <div>
