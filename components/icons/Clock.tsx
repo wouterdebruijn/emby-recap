@@ -1,31 +1,29 @@
 import { JSX } from "preact";
 
 export function Clock(
-  { size = 16, index }: JSX.HTMLAttributes<HTMLButtonElement> & {
-    size?: number;
+  { props, index }: JSX.HTMLAttributes<HTMLButtonElement> & {
+    props: JSX.HTMLAttributes<SVGSVGElement>;
     index: number;
   },
 ) {
   if (index === 1) {
-    return <Clock1 size={size} />;
+    return <Clock1 {...props} />;
   }
   if (index === 2) {
-    return <Clock2 size={size} />;
+    return <Clock2 {...props} />;
   }
-  return <Clock3 size={size} />;
+  return <Clock3 {...props} />;
 }
 
 function Clock1(
-  { size = 16 }: JSX.HTMLAttributes<HTMLButtonElement> & { size?: number },
+  props: JSX.HTMLAttributes<SVGSVGElement>,
 ) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 36 36"
-      height={size}
-      width={size}
-      class="inline"
       alt="Clock icon"
+      {...props}
     >
       <circle fill="#99AAB5" cx="18" cy="18" r="18" />
       <circle fill="#E1E8ED" cx="18" cy="18" r="14" />
@@ -42,15 +40,14 @@ function Clock1(
 }
 
 function Clock2(
-  { size = 16 }: JSX.HTMLAttributes<HTMLButtonElement> & { size?: number },
+  props: JSX.HTMLAttributes<SVGSVGElement>,
 ) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 36 36"
-      height={size}
-      width={size}
       class="inline"
+      {...props}
     >
       <circle fill="#99AAB5" cx="18" cy="18" r="18" />
       <circle fill="#E1E8ED" cx="18" cy="18" r="14" />
@@ -67,15 +64,14 @@ function Clock2(
 }
 
 function Clock3(
-  { size = 16 }: JSX.HTMLAttributes<HTMLButtonElement> & { size?: number },
+  props: JSX.HTMLAttributes<SVGSVGElement>,
 ) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 36 36"
-      height={size}
-      width={size}
       class="inline"
+      {...props}
     >
       <circle fill="#99AAB5" cx="18" cy="18" r="18" />
       <circle fill="#E1E8ED" cx="18" cy="18" r="14" />
