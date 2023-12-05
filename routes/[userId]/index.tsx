@@ -20,6 +20,8 @@ import {
   getEmbyShowList,
   getEmbyWatchList,
 } from "../../util/EmbyData.ts";
+import { MovieStatistics } from "../../components/MovieStatistics.tsx";
+import { ShowStatistics } from "../../components/ShowStatistics.tsx";
 
 interface RefinedData {
   mostWatched: {
@@ -142,69 +144,9 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
 
         {/* Scroll content */}
         <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col px-4">
-          <section class="">
-            <div class="flex flex-col">
-              <h2 class="text-6xl font-bold pt-2">
-                You watched {data.totalMovies} movies this year!
-              </h2>
-              <span class="text-3xl pt-1">
-                That places you on {getPlace(data.movieTier)} place
-              </span>
-            </div>
-            <div>
-              <ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                {data.mostWatched.movies.map((movie) => (
-                  <li class="bg-white p-5 bg-opacity-20 shadow rounded">
-                    <span class="block text-xl truncate">{movie.label}</span>
-                    <span>
-                      {locateDurationString(movie.time)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div class="w-full text-center mt-2 bg-white p-5 bg-opacity-20 shadow rounded">
-              <span class="text-3xl">
-                You spent a total of{" "}
-                <span class="font-bold">
-                  {locateDurationString(data.totalWatchTimeMovies)}
-                </span>{" "}
-                watching movies
-              </span>
-            </div>
-          </section>
+          <MovieStatistics data={data} />
 
-          <section class="mt-16">
-            <div class="flex flex-col">
-              <h2 class="text-6xl font-bold pt-2">
-                You watched {data.totalShows} shows this year!
-              </h2>
-              <span class="text-3xl pt-1">
-                That places you on {getPlace(data.showTier)} place
-              </span>
-            </div>
-            <div>
-              <ul class="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                {data.mostWatched.shows.map((show) => (
-                  <li class="bg-white p-5 bg-opacity-20 shadow rounded">
-                    <span class="block text-xl truncate">{show.label}</span>
-                    <span>
-                      {locateDurationString(show.time)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div class="w-full text-center mt-2 bg-white p-5 bg-opacity-20 shadow rounded">
-              <span class="text-3xl">
-                You spent a total of{" "}
-                <span class="font-bold">
-                  {locateDurationString(data.totalWatchTimeShows)}
-                </span>{" "}
-                watching movies
-              </span>
-            </div>
-          </section>
+          <ShowStatistics data={data} />
 
           <NewYearMessage />
 
