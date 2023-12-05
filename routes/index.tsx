@@ -7,7 +7,7 @@ import {
   EmbyUserList,
   getEmbyUserList,
   getEmbyUserPicture,
-} from "../helper/EmbyData.ts";
+} from "../util/EmbyData.ts";
 
 type base64 = string;
 

@@ -1,10 +1,17 @@
 import { Head } from "$fresh/runtime.ts";
 
 import { Handlers, PageProps } from "$fresh/server.ts";
-import { Watch } from "../../components/icons/Watch.tsx";
 import { Calendar } from "../../components/icons/Calendar.tsx";
 import { Clock } from "../../components/icons/Clock.tsx";
+import { Watch } from "../../components/icons/Watch.tsx";
 
+import { BlockStatistic } from "../../components/BlockStatistic.tsx";
+import { NewYearMessage } from "../../components/NewYearMessage.tsx";
+import {
+  getPlace,
+  getWeekday,
+  locateDurationString,
+} from "../../util/DateTime.ts";
 import {
   EmbyMovieListEntry,
   EmbyShowListEntry,
@@ -13,7 +20,7 @@ import {
   getEmbyMovieList,
   getEmbyShowList,
   getEmbyWatchList,
-} from "../../helper/EmbyData.ts";
+} from "../../util/EmbyData.ts";
 
 interface RefinedData {
   mostWatched: {
@@ -30,11 +37,11 @@ interface RefinedData {
   showTier: number;
   username: string;
   totalTime: number;
-  firstDay: { day: string; count: number };
+  firstDay: [string, number];
 }
 
 export const handler: Handlers<RefinedData | null> = {
-  async GET({ url }, { render, params }) {
+  async GET({ url }, { render, params, state }) {
     const userid = params.userid;
     const username = new URL(url).searchParams.get("name") ?? "Someone";
 
@@ -92,97 +99,10 @@ export const handler: Handlers<RefinedData | null> = {
           item[1] > 0
         )[0],
     };
+
     return render(refinedData);
   },
 };
-
-// Duration is in seconds
-function locateDurationString(
-  duration: number,
-  hoursOnly = false,
-  daysOnly = false,
-) {
-  const remaining = duration;
-  const days = Math.floor(remaining / 86400);
-  const hours = Math.floor((remaining - (days * 86400)) / 3600);
-  const minutes = Math.floor(
-    (remaining - (days * 86400) - (hours * 3600)) / 60,
-  );
-
-  if (hoursOnly && hours !== 0) {
-    return hours === 1 ? `${hours} hour` : `${hours} hours`;
-  }
-
-  if (daysOnly && days !== 0) {
-    return days === 1 ? `${days} day` : `${days} days`;
-  }
-
-  if (days !== 0 && hours !== 0 && minutes !== 0) {
-    return `${days} days, ${hours} hours and ${minutes} minutes`;
-  }
-
-  if (hours !== 0 && minutes !== 0) {
-    return `${hours} hours and ${minutes} minutes`;
-  }
-
-  if (days !== 0 && hours !== 0) {
-    return `${days} days and ${hours} hours`;
-  }
-
-  if (days !== 0) {
-    return `${days} days`;
-  }
-
-  if (hours !== 0) {
-    return `${hours} hours`;
-  }
-
-  if (minutes !== 0) {
-    return `${minutes} minutes`;
-  }
-
-  return `${duration} seconds`;
-}
-
-function getWeekday(day: number) {
-  const weekdays = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  return weekdays[day];
-}
-
-function getPlace(place: number) {
-  switch (place) {
-    case 1:
-      return "1st";
-    case 2:
-      return "2nd";
-    case 3:
-      return "3rd";
-    default:
-      return `${place}th`;
-  }
-}
-
-/**
- * @returns {JSX.Element} A JSX element containing a message if it's the new year
- */
-function NewYearMessage() {
-  const now = new Date();
-  if (now.getMonth() === 11 && now.getDate() > 25) {
-    return <h1 class="text-6xl">Happy {now.getFullYear() + 1}!</h1>;
-  }
-  if (now.getMonth() === 0 && now.getDate() < 5) {
-    return <h1 class="text-6xl">Happy {now.getFullYear()}</h1>;
-  }
-  return <></>;
-}
 
 export default function Home({ data }: PageProps<RefinedData | null>) {
   if (!data) {
@@ -198,64 +118,49 @@ export default function Home({ data }: PageProps<RefinedData | null>) {
         <link rel="stylesheet" href="/app.css" />
       </Head>
       <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col p-8 py-48">
-        <section class="flex items-center flex-grow my-20">
-          <div class="mr-8 hidden md:block">
-            <Watch size={128} />
-          </div>
-          <div class="flex-grow">
-            <h1 class="text-7xl font-bold">
-              <span class="font-bold">
-                {`${Math.ceil(data.totalTime / 60)} `} minutes.
-              </span>
-            </h1>
-            <p class="mt-4 text-3xl">
-              Your total watch time since{" "}
-              {new Date(data.firstDay[0]).toLocaleDateString("en-US", {
-                dateStyle: "long",
-              })}. That is{" "}
-              {` ${locateDurationString(data.totalTime, false, true)}`}!
-            </p>
-          </div>
-        </section>
+        <BlockStatistic
+          title={`${Math.ceil(data.totalTime / 60)} minutes.`}
+          text={`Your total watch time since ${
+            new Date(data.firstDay[0]).toLocaleDateString("en-US", {
+              dateStyle: "long",
+            })
+          }. That is ${locateDurationString(data.totalTime, false, true)}!`}
+          icon={<Watch size={164} />}
+        />
 
-        <section class="flex items-center flex-grow flex-row-reverse my-12">
-          <div class="ml-8 hidden md:block">
-            <Calendar size={164} />
-          </div>
-          <div class="text-right w-full">
-            <div class="pb-8">
-              <h1 class="text-7xl font-bold">Your favorite time</h1>
-              <p class="mt-4 text-3xl">
-                You regularly watch on{" "}
-                {getWeekday(+data.favoriteHour.hour.split("-")[0])} at{" "}
-                {data.favoriteHour.hour.split("-")[1]}:00
-                <br />Here are some of your biggest streaks
-              </p>
-              <ul class="flex flex-col pt-4 xl:flex-row w-full">
-                {data.favoriteDays.map((day, index) => (
-                  <li
-                    class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-grow shadow rounded justify-between ${
-                      index == 0 ? "xl:ml-0" : "xl:ml-5"
-                    } `}
-                  >
-                    <div>
-                      <Clock size={64} index={index} />
-                    </div>
-                    <div>
-                      <h2 class="text-2xl text-white">
-                        {locateDurationString(day.count, true)}
-                      </h2>
-                      <span class="text-sm">
-                        {new Date(day.day).toLocaleDateString("en-US", {
-                          dateStyle: "full",
-                        })}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+        <BlockStatistic
+          title="Your favorite time"
+          text={`You regularly watch on ${
+            getWeekday(+data.favoriteHour.hour.split("-")[0])
+          } at ${data.favoriteHour.hour.split("-")[1]}:00`}
+          icon={<Calendar size={164} />}
+          direction="right"
+        />
+
+        <section>
+          <ul class="flex flex-col pt-4 xl:flex-row w-full">
+            {data.favoriteDays.map((day, index) => (
+              <li
+                class={`bg-white bg-opacity-20 p-5 text-black font-bold flex flex-row flex-grow shadow rounded justify-between ${
+                  index == 0 ? "xl:ml-0" : "xl:ml-5"
+                } `}
+              >
+                <div>
+                  <Clock size={64} index={index} />
+                </div>
+                <div>
+                  <h2 class="text-2xl text-white">
+                    {locateDurationString(day.count, true)}
+                  </h2>
+                  <span class="text-sm">
+                    {new Date(day.day).toLocaleDateString("en-US", {
+                      dateStyle: "full",
+                    })}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
       </div>
       <div class="mx-auto max-w-screen-xl text-white min-h-screen flex flex-col p-8 py-48">
