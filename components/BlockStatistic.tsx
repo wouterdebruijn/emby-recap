@@ -15,20 +15,20 @@ export function BlockStatistic(
     : "flex-row-reverse text-right";
 
   return (
-    <section class={`flex items-center my-32 gap-8 ${directionClass}`}>
+    <section class={`flex items-center gap-3 ${directionClass}`}>
       {icon &&
         (
-          <div>
+          <div class="aspect-square h-32">
             {icon}
           </div>
         )}
       <div class="flex-grow">
-        <h1 class="text-7xl font-bold">
+        <h1 class="text-5xl md:text-7xl font-bold">
           <span class="font-bold">
             {title}
           </span>
         </h1>
-        <p class="mt-4 text-3xl">
+        <p class="text-xl md:text-3xl mt-4 ">
           {text}
         </p>
       </div>

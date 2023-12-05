@@ -9,7 +9,6 @@ export function Movie(
       viewBox="0 0 36 36"
       height={size}
       width={size}
-      class="inline"
       alt="Movie icon"
     >
       <path

@@ -1,16 +1,14 @@
 import { JSX } from "preact";
 
 export function Calendar(
-  { size = 16 }: JSX.HTMLAttributes<HTMLButtonElement> & { size?: number },
+  props: JSX.HTMLAttributes<SVGSVGElement>,
 ) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 36 36"
-      height={size}
-      width={size}
-      class="inline"
       alt="Calendar icon"
+      {...props}
     >
       <path fill="#66757F" d="M28.815 4h1.996v1h-1.996z" />
       <path
