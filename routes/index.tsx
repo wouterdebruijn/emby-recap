@@ -1,6 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { Minidenticon } from "../components/MinidenticonAvatar.tsx";
 
 import {
   EmbyUserList,
@@ -52,12 +53,15 @@ export default function Home(
             <a href={`/${user.id}?name=${user.name}&self=1`}>
               <div class="flex flex-col items-center justify-center p-4 bg-white bg-opacity-30 rounded">
                 <div class="h-24 w-24 rounded-full overflow-hidden">
-                  <img
-                    class="w-full h-full object-cover"
-                    src={data.pictures[index] ||
-                      "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"}
-                    alt="Profile Picture"
-                  />
+                  {data.pictures[index]
+                    ? (
+                      <img
+                        class="w-full h-full object-cover"
+                        src={data.pictures[index] ?? ``}
+                        alt="Profile Picture"
+                      />
+                    )
+                    : <Minidenticon name={user.name} class="bg-gray-300" />}
                 </div>
                 <span class="mt-2 text-lg font-thin">{user.name}</span>
               </div>
