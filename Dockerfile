@@ -1,4 +1,4 @@
-FROM denoland/deno:1.30.2
+FROM denoland/deno:1.38.4
 
 ARG GIT_REVISION
 ENV DENO_DEPLOYMENT_ID=${GIT_REVISION}
@@ -13,7 +13,7 @@ WORKDIR /app
 # These steps will be re-run upon each file change in your working directory:
 ADD . .
 # Compile the main app so that it doesn't need to be compiled each startup/entry.
-RUN deno cache --lock-write main.ts
+RUN deno task cache
 RUN deno task build
 
 

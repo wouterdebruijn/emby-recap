@@ -2,10 +2,11 @@
   "tasks": {
     "start": "deno run -A --watch=static/,routes/ dev.ts",
     "build": "deno run -A dev.ts build",
-    "preview": "deno run -A main.ts"
+    "preview": "deno run -A main.ts",
+    "cache": "deno cache main.ts"
   },
-  "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
   "lock": false,
+  "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.6.0/",
     "preact": "https://esm.sh/preact@10.19.2",
