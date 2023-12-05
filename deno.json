@@ -3,8 +3,9 @@
     "start": "deno run -A --watch=static/,routes/ dev.ts",
     "build": "deno run -A dev.ts build",
     "preview": "deno run -A main.ts",
-    "cache": "deno cache --lock=lock.json --lock-write dev.ts"
+    "cache": "deno cache main.ts"
   },
+  "lock": false,
   "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.6.0/",
