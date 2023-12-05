@@ -1,11 +1,11 @@
 [![Made with Fresh](https://fresh.deno.dev/fresh-badge-dark.svg)](https://fresh.deno.dev)
 
-# Emby Recap
+# 🎥 Emby Recap
 
 A website displaying Emby user statistics in the form of a year recap.
 Displaying watch times, durations, relative placements and counters.
 
-# Installation
+# 🔧 Installation
 
 Available on
 [Docker Hub](https://hub.docker.com/repository/docker/hedium/emby-recap/general)
@@ -24,7 +24,7 @@ need to be provided through environment variables. The following environment
 variables are required:
 
 - EMBY_URL=http://localhost:8096 _# Emby URL to your Emby server_
-- EMBY_API_KEY=ADMIN_ACCOUNT_TOKEN _# Emby API key
+- EMBY_API_KEY=GENERATED_API_KEY _# Emby API key
   [generated through the Emby dashboard.](https://github.com/MediaBrowser/Emby/wiki/API-Key-Authentication)_
 
 The following environment variables are optional:
@@ -66,7 +66,7 @@ EMBY_API_KEY=ADMIN_ACCOUNT_TOKEN
 deno run --allow-read --allow-env --allow-net main.ts
 ```
 
-# Screenshots
+# ✨ Screenshots
 
 <img src="./.github/screenshots/emby-recap-1.png" />
 <img src="./.github/screenshots/emby-recap-2.png" />
